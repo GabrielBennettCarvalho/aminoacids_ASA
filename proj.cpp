@@ -5,6 +5,7 @@
 #include <string>
 #include <cstdint> 
 #include <chrono>
+#include <functional>
 
 // 1. 'static': A matriz é criada apenas UMA vez na memória do programa (segmento de dados),
     //    não na stack e nem na heap a cada chamada.
@@ -44,6 +45,74 @@ inline uint64_t calculate_energy(
 
     return term1 + term2;
 }
+
+// Estrutura auxiliar para simular a recursão
+struct Frame {
+    int i;
+    int j;
+    bool visited; // false = expandir filhos; true = imprimir k
+};
+
+void optimal_path(
+    int n,
+    int dim,
+    const std::vector<int>& ks,
+    const std::function<int (int, int)>& idx
+){
+    std::vector <Frame> stack;
+
+    if(n >= 1){
+        stack.push_back({1, n, false});
+    }
+
+    bool first = true;
+
+    while(!stack.empty()){
+        Frame& current = stack.back();
+
+        int i = current.i;
+        int j = current.j;
+
+        if(i > j){
+            // Caso base: intervalo vazio
+            stack.pop_back();
+            continue;
+        }
+
+        int k = ks[idx(i, j)];
+
+        if(current.visited){
+            // Passo 2: Os filhos (esquerda e direita) já foram resolvidos.
+            // Agora podemos retirar (imprimir) o k, pois ele é o último.
+            if (!first) std::cout << " ";
+            std::cout << k;
+            first = false;
+            
+            stack.pop_back(); // Removemos este nó da pilha
+        } else {
+
+            // Passo 1: Expandir os filhos (esquerda e direita)
+            current.visited = true; // Marcamos que já visitamos este nó
+
+            // Empurrar o filho direito primeiro (para ser processado depois)
+            if (k < j) {
+                stack.push_back({k + 1, j, false});
+            }
+            // Empurrar o filho esquerdo
+            if (i < k ) {
+                stack.push_back({i, k - 1, false});
+
+            }
+            
+        }
+          
+    }
+
+    std::cout << "\n";
+    
+}
+
+
 
 int main() {
     // Make std as fast as printf/sscanf
@@ -114,7 +183,7 @@ int main() {
                                          potentials[i], types[i],
                                         potentials[i+1], types[i+1]);
 
-        //ks[idx(i, i)] = i; // O k é ele próprio
+        ks[idx(i, i)] = i; // O k é ele próprio
     }
     // Start with size = 2
     for (int len = 2; len <= n; len++) {
@@ -154,6 +223,8 @@ int main() {
     }
 
     std::cout << dp[idx(1, n)] << "\n";
+
+    optimal_path(n, dim, ks, idx);
 
     return 0;
 }
