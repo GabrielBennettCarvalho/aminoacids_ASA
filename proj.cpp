@@ -119,7 +119,7 @@ int main() {
     std::ios_base::sync_with_stdio(0);
     std::cin.tie(0);
 
-    int map[128];
+    int map[128] = {0};
 
     // map to convert the types to indexs
     map['P'] = 0;
@@ -172,11 +172,10 @@ int main() {
 
     // K matrix
 
-    std::vector<int> ks(dim * dim, 0);
-
+    std::vector<int16_t> ks(dim * dim, 0);
     // Lambda que captura 'dim' por valor e faz o cálculo
-    auto idx = [dim](int i, int j) { return i * dim + j; };
-
+    auto idx = [dim](int i, int j) { return (size_t)i * dim + j; };
+    
     // Initialize the diagonal with size = 1 (not counting the Ts)
     for (int i = 1; i <=  n; i++) {
         dp[idx(i, i)] = calculate_energy(potentials[i-1], types[i-1], 
