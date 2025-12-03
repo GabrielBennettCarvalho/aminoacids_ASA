@@ -56,7 +56,7 @@ struct Frame {
 void optimal_path(
     int n,
     int dim,
-    const std::vector<int>& ks,
+    const std::vector<int16_t>& ks,
     const std::function<int (int, int)>& idx
 ){
     std::vector <Frame> stack;
